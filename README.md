@@ -51,6 +51,8 @@ If --username and/or --dbname are not specified the current username is used as 
 
   --heightcolumn                (Default: height) height column
 
+  --groundcolumn                (Default: ground) ground column
+
   --idcolumn                    (Default: id) Id column
 
   --stylecolumn                 (Default: style) Style column
