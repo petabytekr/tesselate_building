@@ -31,6 +31,9 @@ namespace tesselate_building_sample_console
         [Option("heightcolumn", Required = false, Default = "height", HelpText = "height column")]
         public string HeightColumn { get; set; }
 
+        [Option("groundcolumn", Required = false, Default = "ground", HelpText = "ground column")]
+        public string GroundColumn { get; set; }
+
         [Option("idcolumn", Required = false, Default = "id", HelpText = "Id column")]
         public string IdColumn { get; set; }
 
