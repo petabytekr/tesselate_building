@@ -19,7 +19,7 @@ namespace tesselate_building_core
             polyhedral.Geometries.Add(GetPolygonZ(footprint, fromZ + height));
             if (buildingStyle.Storeys == null)
             {
-                var walls = MakeWalls(footprint, fromZ, height - fromZ);
+                var walls = MakeWalls(footprint, fromZ, height);
                 polyhedral.Geometries.AddRange(walls);
             }
             else
@@ -105,7 +105,7 @@ namespace tesselate_building_core
             return res;
         }
 
-        public static List<Polygon> MakeWalls(Polygon footprint, double fromZ, double storeyheight)
+        public static List<Polygon> MakeWalls(Polygon footprint, double fromZ, double height)
         {
             var polygons = new List<Polygon>();
             for (var i = 1; i < footprint.ExteriorRing.Points.Count; i++)
@@ -117,8 +117,8 @@ namespace tesselate_building_core
                 t1.Dimension = Dimension.Xyz;
 
                 t1.ExteriorRing.Points.Add(new Point((double)p0.X, (double)p0.Y, fromZ));
-                t1.ExteriorRing.Points.Add(new Point((double)p0.X, (double)p0.Y, fromZ + storeyheight));
-                t1.ExteriorRing.Points.Add(new Point((double)p1.X, (double)p1.Y, fromZ + storeyheight));
+                t1.ExteriorRing.Points.Add(new Point((double)p0.X, (double)p0.Y, fromZ + height));
+                t1.ExteriorRing.Points.Add(new Point((double)p1.X, (double)p1.Y, fromZ + height));
                 t1.ExteriorRing.Points.Add(new Point((double)p1.X, (double)p1.Y, fromZ));
                 t1.ExteriorRing.Points.Add(new Point((double)p0.X, (double)p0.Y, fromZ));
 
