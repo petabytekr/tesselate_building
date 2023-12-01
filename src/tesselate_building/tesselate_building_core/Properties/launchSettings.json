@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "tesselate_building_core": {
+      "commandName": "Project",
+      "commandLineArgs": "-h d8 -p 5433 -U postgres -d 3dwork -f cesium -t pline -i geom_z -o geom_triangle --idcolumn ogc_fid --stylecolumn style --shaderscolumn shaders --heightcolumn height --groundcolumn ground --wall true"
+    }
+  }
+}

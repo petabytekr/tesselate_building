@@ -41,5 +41,9 @@ namespace tesselate_building_sample_console
         public string StyleColumn { get; set; }
         [Option("shaderscolumn", Required = false, Default = "shaders", HelpText = "shaders column")]
         public string ShadersColumn { get; set; }
+
+        [Option("wall", Required = false, Default = "false", HelpText = "Wall mode")]
+        public string Wall { get; set; }
+
     }
 }

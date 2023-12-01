@@ -32,6 +32,8 @@ namespace tesselate_building_sample_console
 
                 var istrusted = TrustedConnectionChecker.HasTrustedConnection(connectionString);
 
+                var isWall = string.IsNullOrEmpty(o.Wall) ? false :  Boolean.Parse(o.Wall);
+
                 if (!istrusted)
                 {
                     Console.Write($"Password for user {o.User}: ");
@@ -45,21 +47,33 @@ namespace tesselate_building_sample_console
 
 
                 var select = $"select ST_AsBinary({o.InputGeometryColumn}) as geometry, {o.HeightColumn} as height, {o.GroundColumn} as ground, style, {o.IdColumn} as id";
-                var sql = $"{select} from {o.Table}";
+                var sql = $"{select} from {o.Table} where {o.InputGeometryColumn} is not null";
+
+                Console.WriteLine($"Execute SQL : {sql}");
 
                 var buildings = conn.Query<Building>(sql);
 
                 var i = 1;
                 foreach (var building in buildings)
                 {
-                    var polygon = (Polygon)building.Geometry;
-                    var wktFootprint = polygon.SerializeString<WktSerializer>();
+                    //var polygon = (Polygon)building.Geometry;
+                    //var wktFootprint = polygon.SerializeString<WktSerializer>();
                     var height = building.Height;
                     var ground = building.Ground;
-                    var points = polygon.ExteriorRing.Points;
+                    //var points = polygon.ExteriorRing.Points;
 
                     var buildingZ = ground;
-                    var res = TesselateBuilding.MakeBuilding(polygon, buildingZ, height, building.BuildingStyle);
+                    (PolyhedralSurface polyhedral, System.Collections.Generic.List<string> colors) res;
+
+                    if (isWall)
+                    {
+                        res = TesselateBuilding.MakeWall((LineString)building.Geometry, buildingZ, height, building.BuildingStyle);
+                    }
+                    else
+                    {
+                        res = TesselateBuilding.MakeBuilding((Polygon)building.Geometry, buildingZ, height, building.BuildingStyle);
+                    }
+                    
                     var wkt = res.polyhedral.SerializeString<WktSerializer>();
 
                     var shaders = new ShaderColors();

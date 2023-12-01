@@ -76,6 +76,58 @@ namespace tesselate_building_core
             }
             return (polyhedralNew, colors);
         }
+        public static (PolyhedralSurface polyhedral, List<string> colors) MakeWall(LineString footprint, double fromZ, double height, BuildingStyle buildingStyle)
+        {
+            var colors = new List<string>();
+            var polyhedral = new PolyhedralSurface();
+            polyhedral.Dimension = Dimension.Xyz;
+
+            polyhedral.Geometries.Add(MakeLineStringWall(footprint));
+
+
+            var stream = new MemoryStream();
+            polyhedral.Serialize<WkbSerializer>(stream);
+            var wkb = stream.ToArray();
+            var triangulatedWkb = Triangulator.Triangulate(wkb);
+            var polyhedralNew = (PolyhedralSurface)Geometry.Deserialize<WkbSerializer>(triangulatedWkb);
+
+            foreach (var polygon in polyhedralNew.Geometries)
+            {
+                var normal = polygon.GetNormal();
+
+                if (Math.Abs(normal.X) > Math.Abs(normal.Y) && Math.Abs(normal.X) > Math.Abs(normal.Z) ||
+                        (Math.Abs(normal.Y) > Math.Abs(normal.Z)))
+                {
+                    //  (yz) projection
+                    if (buildingStyle.WallsColor == null)
+                    {
+                        // use storeys
+                        var storeyColor = GetStoreyColor(polygon, buildingStyle.Storeys);
+                        colors.Add(storeyColor);
+
+                    }
+                    else
+                    {
+                        colors.Add(buildingStyle.WallsColor);
+                    }
+                }
+                else
+                {
+                    // (xy) projextion
+                    if (polygon.ExteriorRing.Points[0].Z == fromZ)
+                    {
+                        // floor
+                        colors.Add(buildingStyle.FloorColor);
+                    }
+                    else
+                    {
+                        // roof
+                        colors.Add(buildingStyle.RoofColor);
+                    }
+                }
+            }
+            return (polyhedralNew, colors);
+        }
 
         private static string GetStoreyColor(Polygon polygon, List<Storey> storeys)
         {
@@ -126,6 +178,31 @@ namespace tesselate_building_core
             }
 
             return polygons;
+        }
+
+        public static Polygon MakeLineStringWall(LineString footprint)
+        {
+            var newPoints = new List<Point>();
+
+            // ground points
+            foreach(var p in footprint.Points)
+            {
+                newPoints.Add(new Point((double)p.X, (double)p.Y, (double)0.0));
+            }
+
+            // skyline points
+            for(var i= footprint.Points.Count-1; i>=0; i--)
+            {
+                var p = footprint.Points[i];
+                newPoints.Add(new Point((double)p.X, (double)p.Y, (double)p.Z));
+            }
+
+            // last, first connect
+            newPoints.Add(new Point((double)newPoints[0].X, (double)newPoints[0].Y, (double)newPoints[0].Z));
+
+            var res = new Polygon(newPoints);
+            res.Dimension = Dimension.Xyz;
+            return res;
         }
     }
 }
