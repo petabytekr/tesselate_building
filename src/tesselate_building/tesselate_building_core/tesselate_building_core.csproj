@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+	<WarningsNotAsErrors>$(WarningsNotAsErrors);NU1903</WarningsNotAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
